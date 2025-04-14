@@ -44,8 +44,8 @@ function getRelativePath(selectedFolder: string, filePath: string): string {
 /**
  * Assembles the formatted content for copying
  * The content is assembled in the following order:
- * 1. File tree (if enabled) within <file_map> tags
- * 2. All selected file content within <file_contents> tags
+ * 1. File tree (if enabled) within <FILE STRUCTURE> tags
+ * 2. All selected file content within <CODEBASE> tags
  * 3. User instructions at the end within <user_instructions> tags
  * 
  * Each section is clearly separated with the appropriate tags
@@ -86,15 +86,15 @@ export const formatContentForCopying = ({
 
   let concatenatedString = "";
   
-  // Add ASCII file tree if enabled within <file_map> tags
+  // Add ASCII file tree if enabled within <FILE STRUCTURE> tags
   if (includeFileTree && selectedFolder) {
     const normalizedFolder = normalizePath(selectedFolder);
     const asciiTree = generateAsciiFileTree(sortedSelected, selectedFolder);
-    concatenatedString += `<file_map>\n${normalizedFolder}\n${asciiTree}\n</file_map>\n\n`;
+    concatenatedString += `<FILE STRUCTURE>\n${normalizedFolder}\n${asciiTree}\n</FILE STRUCTURE>\n\n`;
   }
   
   // Add file contents section
-  concatenatedString += `<file_contents>\n`;
+  concatenatedString += `<CODEBASE>\n`;
   
   // Add each file with its path and language-specific syntax highlighting
   sortedSelected.forEach((file: FileData) => {
@@ -120,7 +120,7 @@ export const formatContentForCopying = ({
     concatenatedString += `${pathInfo}\n\`\`\`${language}\n${file.content}\n\`\`\`\n\n`;
   });
   
-  concatenatedString += `</file_contents>\n\n`;
+  concatenatedString += `</CODEBASE>\n\n`;
   
   // Add user instructions at the end if present
   if (userInstructions.trim()) {
