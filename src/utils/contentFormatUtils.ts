@@ -3,7 +3,7 @@
  */
 
 import { FileData } from "../types/FileTypes";
-import { generateAsciiFileTree, normalizePath } from "./pathUtils";
+import { generateAsciiFileTree, normalizePath, basename, dirname } from "./pathUtils";
 import { getLanguageFromFilename } from "./languageUtils";
 
 /**
@@ -16,6 +16,29 @@ interface FormatContentParams {
   includeFileTree: boolean;    // Whether to include file tree in output
   selectedFolder: string | null; // Current selected folder path
   userInstructions: string;    // User instructions to append to content
+}
+
+/**
+ * Calculates the relative path from the selectedFolder to the file path
+ * @param selectedFolder Base folder path
+ * @param filePath Full file path
+ * @returns Relative path from selectedFolder to filePath
+ */
+function getRelativePath(selectedFolder: string, filePath: string): string {
+  const normalizedFolder = normalizePath(selectedFolder);
+  const normalizedFile = normalizePath(filePath);
+  
+  // If the file starts with the folder path, we can calculate a relative path
+  if (normalizedFile.startsWith(normalizedFolder)) {
+    let relativePath = normalizedFile.substring(normalizedFolder.length);
+    // Remove any leading slash
+    relativePath = relativePath.replace(/^\/+/, '');
+    return relativePath;
+  }
+  
+  // If file path doesn't start with the selected folder path,
+  // we can't calculate a proper relative path
+  return filePath;
 }
 
 /**
@@ -80,8 +103,21 @@ export const formatContentForCopying = ({
     // Normalize the file path for cross-platform compatibility
     const normalizedPath = normalizePath(file.path);
     
-    // Add file path and content with language-specific code fencing
-    concatenatedString += `File: ${normalizedPath}\n\`\`\`${language}\n${file.content}\n\`\`\`\n\n`;
+    // Calculate relative path if a selected folder is provided
+    let relativePath = "";
+    if (selectedFolder) {
+      relativePath = getRelativePath(selectedFolder, file.path);
+    }
+    
+    // Add file path (both absolute and relative) and content with language-specific code fencing
+    let pathInfo = `File: ${normalizedPath}`;
+    if (relativePath && relativePath !== file.path) {
+      // Include the selected directory name at the beginning of the relative path
+      const folderName = selectedFolder ? basename(selectedFolder) : "";
+      pathInfo = `File: ${folderName}/${relativePath}`;
+    }
+    
+    concatenatedString += `${pathInfo}\n\`\`\`${language}\n${file.content}\n\`\`\`\n\n`;
   });
   
   concatenatedString += `</file_contents>\n\n`;
