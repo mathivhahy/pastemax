@@ -3,7 +3,7 @@
  */
 
 import { FileData } from "../types/FileTypes";
-import { generateAsciiFileTree, normalizePath, basename, dirname } from "./pathUtils";
+import { generateAsciiFileTree, normalizePath, basename, dirname, isSubPath } from "./pathUtils";
 import { getLanguageFromFilename } from "./languageUtils";
 
 /**
@@ -39,6 +39,20 @@ function getRelativePath(selectedFolder: string, filePath: string): string {
   // If file path doesn't start with the selected folder path,
   // we can't calculate a proper relative path
   return filePath;
+}
+
+/**
+ * Helper function to get all files from a specific folder
+ * @param files All files in the project
+ * @param folderPath The path of the folder to filter by
+ * @returns Array of files that belong to the specified folder
+ */
+function getFilesInFolder(files: FileData[], folderPath: string): FileData[] {
+  const normalizedFolderPath = normalizePath(folderPath);
+  return files.filter((file) => {
+    const normalizedFilePath = normalizePath(file.path);
+    return isSubPath(normalizedFolderPath, normalizedFilePath);
+  });
 }
 
 /**
@@ -89,7 +103,13 @@ export const formatContentForCopying = ({
   // Add ASCII file tree if enabled within <FILE STRUCTURE> tags
   if (includeFileTree && selectedFolder) {
     const normalizedFolder = normalizePath(selectedFolder);
-    const asciiTree = generateAsciiFileTree(sortedSelected, selectedFolder);
+    
+    // Get all files in the selected folder for the tree view instead of just selected files
+    const allFolderFiles = getFilesInFolder(files, selectedFolder);
+    
+    // Generate the ASCII tree with all files in the folder
+    const asciiTree = generateAsciiFileTree(allFolderFiles, selectedFolder);
+    
     concatenatedString += `<FILE STRUCTURE>\n${normalizedFolder}\n${asciiTree}\n</FILE STRUCTURE>\n\n`;
   }
   
