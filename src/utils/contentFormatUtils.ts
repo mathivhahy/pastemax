@@ -110,7 +110,10 @@ export const formatContentForCopying = ({
     // Generate the ASCII tree with all files in the folder
     const asciiTree = generateAsciiFileTree(allFolderFiles, selectedFolder);
     
-    concatenatedString += `<FILE STRUCTURE>\n${normalizedFolder}\n${asciiTree}\n</FILE STRUCTURE>\n\n`;
+    // Only use the folder name instead of the full path
+    const folderName = basename(selectedFolder);
+    
+    concatenatedString += `<FILE STRUCTURE>\n${folderName}\n${asciiTree}\n</FILE STRUCTURE>\n\n`;
   }
   
   // Add file contents section
