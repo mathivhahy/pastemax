@@ -2,6 +2,8 @@ npm run dev:electron
 
 npm run package:mac
 
+npm run package:mac:app
+
 .
 
 .
