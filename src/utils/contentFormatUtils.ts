@@ -58,7 +58,7 @@ function getFilesInFolder(files: FileData[], folderPath: string): FileData[] {
 /**
  * Assembles the formatted content for copying
  * The content is assembled in the following order:
- * 1. File tree (if enabled) within <FILE STRUCTURE> tags
+ * 1. File tree (if enabled) within <FILE_STRUCTURE> tags
  * 2. All selected file content within <CODEBASE> tags
  * 3. User instructions at the end within <user_instructions> tags
  * 
@@ -100,7 +100,7 @@ export const formatContentForCopying = ({
 
   let concatenatedString = "";
   
-  // Add ASCII file tree if enabled within <FILE STRUCTURE> tags
+  // Add ASCII file tree if enabled within <FILE_STRUCTURE> tags
   if (includeFileTree && selectedFolder) {
     const normalizedFolder = normalizePath(selectedFolder);
     
@@ -113,7 +113,7 @@ export const formatContentForCopying = ({
     // Only use the folder name instead of the full path
     const folderName = basename(selectedFolder);
     
-    concatenatedString += `<FILE STRUCTURE>\n${folderName}\n${asciiTree}\n</FILE STRUCTURE>\n\n`;
+    concatenatedString += `<FILE_STRUCTURE>\n${folderName}\n${asciiTree}\n</FILE_STRUCTURE>\n\n`;
   }
   
   // Add file contents section
@@ -147,7 +147,7 @@ export const formatContentForCopying = ({
   
   // Add user instructions at the end if present
   if (userInstructions.trim()) {
-    concatenatedString += `<user_instructions>\n${userInstructions.trim()}\n</user_instructions>`;
+    concatenatedString += `${userInstructions.trim()}`;
   }
 
   return concatenatedString;
