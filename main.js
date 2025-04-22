@@ -447,8 +447,9 @@ async function readFilesRecursively(dir, rootDir, ignoreFilter, window) {
       // Calculate relative path safely
       const relativePath = safeRelativePath(rootDir, fullPath);
 
-      // Skip PasteMax app directories and invalid paths
-      if (fullPath.includes('.app') || fullPath === app.getAppPath() || 
+      // Skip PasteMax app directories and invalid paths - Refined .app check
+      const isAppBundle = /\.app($|\/)/.test(fullPath); // Check for /.app/ or path ending in .app
+      if (isAppBundle || fullPath === app.getAppPath() ||
           !isValidPath(relativePath) || relativePath.startsWith('..')) {
         console.log('Skipping directory:', fullPath);
         continue;
@@ -480,14 +481,16 @@ async function readFilesRecursively(dir, rootDir, ignoreFilter, window) {
         // Calculate relative path safely
         const relativePath = safeRelativePath(rootDir, fullPath);
 
-        // Skip PasteMax app files and invalid paths
-        if (fullPath.includes('.app') || fullPath === app.getAppPath() || 
+        // Skip PasteMax app files and invalid paths - Refined .app check
+        const isAppBundleFile = /\.app($|\/)/.test(fullPath); // Check for /.app/ or path ending in .app
+        if (isAppBundleFile || fullPath === app.getAppPath() || 
             !isValidPath(relativePath) || relativePath.startsWith('..')) {
-          console.log('Skipping file:', fullPath);
+          // Removed console log here for files to reduce noise, keep for dirs
           return null;
         }
 
-        if (ignoreFilter.ignores(relativePath)) {
+        const isIgnored = ignoreFilter.ignores(relativePath);
+        if (isIgnored) {
           return null;
         }
 
